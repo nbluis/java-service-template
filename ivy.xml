@@ -31,5 +31,6 @@
 	<dependencies>
 		<dependency org="log4j" name="log4j" rev="1.2.17" conf="deploy->compile" />
 		<dependency org="com.google.inject" name="guice" rev="3.0" conf="deploy->compile" /> 
+		<dependency org="junit" name="junit" rev="4.11" conf="dev->compile" />
 	</dependencies>
 </ivy-module>

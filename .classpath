@@ -4,5 +4,7 @@
 	<classpathentry kind="src" path="src/main/test"/>
 	<classpathentry kind="src" path="src/main/resource"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=java-service-template&amp;ivyXmlPath=ivy.xml&amp;confs=dev"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=java-service-template&amp;ivyXmlPath=ivy.xml&amp;confs=deploy"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -9,6 +9,7 @@ Using:
 	Apache Ant
 	Google Guice
 	Log4J
+	jUnit
 
 config.properties:
 	Contains the global project properties
