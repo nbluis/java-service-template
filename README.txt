@@ -1,15 +1,28 @@
 java-service-template
 =====================
 
-Is a template project to create runnable services in java.
+Template project to create runnable services in java.
+
 Using:
-	Eclipse
+	Eclipse (with Apache Ivy IDE)
 	Hibernate Standalone
 	Apache Ivy
 	Apache Ant
 	Google Guice
 	Log4J
 	jUnit
+
+HOW-TO-USE
+==========
+
+- Import eclipse project
+- Run: Eclipse -> Project -> Ivy -> Resolve
+- Read the "CONFIGURING" section
+- Be happy!
+
+
+CONFIGURING
+==========
 
 config.properties:
 	Contains the global project properties
