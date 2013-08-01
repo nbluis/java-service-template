@@ -14,5 +14,3 @@ config.properties:
 
 ivy.xml:
 	File that configures the project dependencies (using apache ivy)
-	
-		
