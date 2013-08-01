@@ -2,6 +2,13 @@ java-service-template
 =====================
 
 Is a template project to create runnable services in java.
+Using:
+	Eclipse
+	Hibernate Standalone
+	Apache Ivy
+	Apache Ant
+	Google Guice
+	Log4J
 
 config.properties:
 	Contains the global project properties
