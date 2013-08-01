@@ -1,0 +1,149 @@
+<project name="java-service-template" basedir="." default="jar">
+
+	<!--  Default folders to be used  -->
+	<property name="src.dir" value="${basedir}/src/main/java" />
+	<property name="test.dir" value="${basedir}/src/main/test" />
+	<property name="resource.dir" value="${basedir}/src/main/resource" />
+	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="out.dir" value="${basedir}/build" />
+	<property name="metrics.dir" value="${out.dir}/metrics" />
+	<property name="buildLib.dir" value="${basedir}/buildLib" />
+	<property name="bin.dir" value="${basedir}/bin" />
+	<property name="jar.file" value="${out.dir}/java-service-template.jar" />
+	<property name="jar.main.class" value="org.javaservicetemplate.core.Main" />
+	<property name="junit.suite" value="org.javaservicetemplate.util.AllTests" />
+	<property name="junit.dir" value="${metrics.dir}/junit" />
+	<property name="emma.dir" value="${metrics.dir}/emma" />
+	<property name="pmd.dir" value="${metrics.dir}/pmd" />
+	<property name="cpd.file.name" value="${pmd.dir}/cpd_pmd.xml" />
+	<property name="cpd.file.formatter" value="${resource.dir}/cpdhtml.xslt" />
+	<property name="cpd.report.file" value="${pmd.dir}/cpd_pmd.html" />
+
+	<!-- Defining classpath project-->
+	<path id="project.classpath">
+		<pathelement location="${bin.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="*/**.jar" />
+		</fileset>
+		<fileset dir="${buildLib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Initialize(delete/create) all directories to be used -->
+	<target name="init">
+		<delete dir="${bin.dir}" />
+		<delete dir="${out.dir}" />
+		<mkdir dir="${bin.dir}" />
+		<mkdir dir="${out.dir}" />
+		<mkdir dir="${metrics.dir}" />
+		<mkdir dir="${emma.dir}" />
+		<mkdir dir="${pmd.dir}" />
+		<mkdir dir="${junit.dir}" />
+	</target>
+
+	<!-- Compile the current source code -->
+	<target name="compile" depends="init">
+		<javac debug="on" srcdir="${src.dir}" destdir="${bin.dir}" encoding="UTF-8">
+			<classpath refid="project.classpath" />
+		</javac>
+		<copy todir="${bin.dir}">
+			<fileset dir="${resource.dir}" />
+		</copy>
+		<copy todir="${emma.dir}">
+			<fileset file="${basedir}/*.properties" />
+		</copy>
+	</target>
+
+	<!-- Compile the test source control -->
+	<target name="compile-test">
+		<javac debug="on" srcdir="${test.dir}" destdir="${bin.dir}" encoding="UTF-8">
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<!-- Define tasks-->
+	<taskdef resource="emma_ant.properties" classpathref="project.classpath" />
+	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="project.classpath" />
+	<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="project.classpath" />
+	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="project.classpath" />
+
+	<!-- Instrument all classes using Emma plugin -->
+	<target name="instrument" depends="compile">
+		<emma>
+			<instr instrpath="${bin.dir}" destdir="${emma.dir}" metadatafile="${emma.dir}/metadata.emma" merge="false" mode="fullcopy" />
+		</emma>
+	</target>
+
+	<!-- Run suite case tests -->
+	<target name="test" depends="instrument, compile, compile-test">
+		<junit haltonfailure="false" haltonerror="false" fork="true" printsummary="yes" failureproperty="unit.test.failure">
+			<classpath>
+				<pathelement location="${emma.dir}/classes" />
+				<pathelement location="${emma.dir}/lib" />
+				<path refid="project.classpath" />
+			</classpath>
+			<formatter type="xml" />
+			<test name="${junit.suite}" todir="${junit.dir}" />
+			<jvmarg value="-Demma.coverage.out.file=${emma.dir}/coverage.emma" />
+			<jvmarg value="-Demma.coverage.out.merge=false" />
+		</junit>
+		<junitreport todir="${junit.dir}">
+			<fileset dir="${junit.dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${junit.dir}" />
+		</junitreport>
+		<fail message="At least one unit test has failed" if="unit.test.failure" />
+	</target>
+
+	<!-- Generate code coverage metrics -->
+	<target name="emma" depends="test">
+		<emma>
+			<report sourcepath="${src.dir}" sort="+block,+name,+method,+class" metrics="method:70,block:80,line:80,class:100" encoding="UTF-8">
+				<fileset dir="${emma.dir}">
+					<include name="*.emma" />
+				</fileset>
+				<html outfile="${emma.dir}/index.html" depth="method" columns="name,class,method,block,line" />
+			</report>
+		</emma>
+	</target>
+
+	<!-- Check for code smell-->
+	<target name="pmd">
+		<pmd rulesetfiles="rulesets/favorites.xml" encoding="UTF-8">
+			<formatter type="net.sourceforge.pmd.renderers.HTMLRenderer" toFile="${pmd.dir}/pmd.html" />
+			<formatter type="net.sourceforge.pmd.renderers.SummaryHTMLRenderer" toFile="${pmd.dir}/pmd.html" />
+			<formatter type="net.sourceforge.pmd.renderers.VBHTMLRenderer" toFile="${pmd.dir}/pmd_vb.html" />
+			<formatter type="net.sourceforge.pmd.renderers.XMLRenderer" toFile="${pmd.dir}/pmd_xml.xml" />
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+		</pmd>
+	</target>
+
+	<!-- Check for duplication code -->
+	<target name="cpd">
+		<cpd minimumTokenCount="30" outputFile="${cpd.file.name}" format="xml">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+		</cpd>
+		<xslt in="${cpd.file.name}" style="${cpd.file.formatter}" out="${cpd.report.file}" />
+	</target>
+
+	<!-- Compress the app and generate the war file -->
+	<target name="jar" depends="compile,emma,pmd,cpd">
+		<jar destfile="${jar.file}" compress="true">
+			<zipgroupfileset dir="${lib.dir}" includes="*/**.jar" />
+			<fileset dir="${bin.dir}" />
+			<manifest>
+				<attribute name="Main-Class" value="${jar.main.class}" />
+			</manifest>
+		</jar>
+		<copy todir="${out.dir}">
+			<fileset file="${basedir}/*.properties" excludes="junit*.properties" />
+		</copy>
+	</target>
+
+</project>
