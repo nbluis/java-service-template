@@ -29,9 +29,11 @@
 		<conf name="dev" extends="deploy"/>
 	</configurations>
 	<dependencies>
-		<dependency org="log4j" name="log4j" rev="1.2.17" conf="deploy->master" />
-		<dependency org="org.apache.commons" name="commons-lang3" rev="3.1" conf="deploy->master"/>
 		<dependency org="com.google.inject" name="guice" rev="3.0" conf="deploy->*" /> 
+		<dependency org="org.hibernate" name="hibernate-core" rev="4.2.3.Final" conf="deploy->compile" />
+		<dependency org="org.apache.commons" name="commons-lang3" rev="3.1" conf="deploy->master"/>
+		<dependency org="log4j" name="log4j" rev="1.2.17" conf="deploy->master" />
+
 		<dependency org="junit" name="junit" rev="4.11" conf="dev->*" />
 		<dependency org="org.mockito" name="mockito-all" rev="1.9.5" conf="dev->*" />
 	</dependencies>
