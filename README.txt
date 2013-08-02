@@ -8,9 +8,11 @@ Using:
 	Hibernate Standalone
 	Apache Ivy
 	Apache Ant
+	Apache commons-lang
 	Google Guice
 	Log4J
 	jUnit
+	Mockito
 
 HOW-TO-USE
 ==========
@@ -22,7 +24,7 @@ HOW-TO-USE
 
 
 CONFIGURING
-==========
+===========
 
 config.properties:
 	Contains the global project properties
