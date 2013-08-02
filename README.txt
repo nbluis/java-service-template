@@ -26,6 +26,12 @@ HOW-TO-USE
 CONFIGURING
 ===========
 
+- Project and package names:
+	- Replace the project name
+	- Replace the package names (src and test source folders)
+	- Replace the project name into .project and .classpath files
+	- Replace the package names into build.xml
+
 config.properties:
 	Contains the global project properties
 	This file will be stand outside of project jar to simplify changes.
