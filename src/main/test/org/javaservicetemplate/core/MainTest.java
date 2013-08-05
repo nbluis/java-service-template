@@ -50,7 +50,7 @@ public class MainTest {
 
 	@Test
 	public void shouldCallImporterManagerContinuously() {
-		Configuration.getConfiguration().setManagerSleepTime(1L);
+		Config.getConfiguration().setManagerSleepTime(1L);
 		try {
 			Main.main(null);
 		} catch (Exception e) {

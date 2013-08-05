@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Configuration {
+public class Config {
 
 	private static final String CONFIG_FILE = "config.properties";
 	private static final String CONNECTION_URL = "connection.url";
@@ -13,18 +13,18 @@ public class Configuration {
 	private static final String CONNECTION_PASSWORD = "connection.password";
 	private static final String MANAGER_SLEEP_TIME = "manager.sleepTime";
 
-	private static Configuration configuration;
+	private static Config configuration;
 
 	private Properties properties;
 
-	public static synchronized Configuration getConfiguration() {
+	public static synchronized Config getConfiguration() {
 		if (configuration == null)
-			configuration = new Configuration();
+			configuration = new Config();
 
 		return configuration;
 	}
 
-	private Configuration() {
+	private Config() {
 		FileInputStream in = null;
 		try {
 			File directory = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();

@@ -9,11 +9,11 @@ import org.junit.Test;
 
 public class ConfigurationTest {
 
-	private Configuration configuration;
+	private Config configuration;
 
 	@Before
 	public void setUp() {
-		this.configuration = Configuration.getConfiguration();
+		this.configuration = Config.getConfiguration();
 	}
 
 	@Test

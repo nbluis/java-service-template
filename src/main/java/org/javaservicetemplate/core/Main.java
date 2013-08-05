@@ -1,7 +1,7 @@
 package org.javaservicetemplate.core;
 
 import static java.lang.System.currentTimeMillis;
-import static org.javaservicetemplate.core.Configuration.getConfiguration;
+import static org.javaservicetemplate.core.Config.getConfiguration;
 import static org.javaservicetemplate.injection.InjectorCreator.createInjector;
 
 import org.apache.log4j.Logger;
