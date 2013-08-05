@@ -1,17 +1,20 @@
-<project name="java-service-template" basedir="." default="jar">
+<project name="org.javaservicetemplate.core" basedir="." default="jar" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!--  Default folders to be used  -->
+	<property name="jar.main.class" value="org.javaservicetemplate.core.Main" />
 	<property name="src.dir" value="${basedir}/src/main/java" />
 	<property name="test.dir" value="${basedir}/src/main/test" />
 	<property name="resource.dir" value="${basedir}/src/main/resource" />
-	<property name="lib.dir" value="${basedir}/lib" />
-	<property name="out.dir" value="${basedir}/build" />
-	<property name="metrics.dir" value="${out.dir}/metrics" />
-	<property name="buildLib.dir" value="${basedir}/buildLib" />
+
 	<property name="bin.dir" value="${basedir}/bin" />
-	<property name="jar.file" value="${out.dir}/java-service-template.jar" />
-	<property name="jar.main.class" value="org.javaservicetemplate.core.Main" />
-	<property name="junit.suite" value="org.javaservicetemplate.util.AllTests" />
+	<property name="bin.classes.dir" value="${bin.dir}/classes" />
+	<property name="bin.test.dir" value="${bin.dir}/tests" />
+	<property name="bin.emma.dir" value="${bin.dir}/emma" />
+	<property name="bin.lib.dir" value="${bin.dir}/lib" />
+
+	<property name="out.dir" value="${basedir}/dist" />
+	<property name="metrics.dir" value="${out.dir}/metrics" />
+	<property name="jar.file" value="${out.dir}/javaservicetemplate.jar" />
 	<property name="junit.dir" value="${metrics.dir}/junit" />
 	<property name="emma.dir" value="${metrics.dir}/emma" />
 	<property name="pmd.dir" value="${metrics.dir}/pmd" />
@@ -21,72 +24,79 @@
 
 	<!-- Defining classpath project-->
 	<path id="project.classpath">
-		<pathelement location="${bin.dir}" />
-		<fileset dir="${lib.dir}">
-			<include name="*/**.jar" />
-		</fileset>
-		<fileset dir="${buildLib.dir}">
-			<include name="*.jar" />
-		</fileset>
+		<pathelement location="${bin.classes.dir}" />
 	</path>
 
-	<!-- Initialize(delete/create) all directories to be used -->
-	<target name="init">
-		<delete dir="${bin.dir}" />
-		<delete dir="${out.dir}" />
-		<mkdir dir="${bin.dir}" />
-		<mkdir dir="${out.dir}" />
-		<mkdir dir="${metrics.dir}" />
-		<mkdir dir="${emma.dir}" />
-		<mkdir dir="${pmd.dir}" />
-		<mkdir dir="${junit.dir}" />
-	</target>
+	<ivy:cachepath conf="dev" pathid="project.classpath" />
 
-	<!-- Compile the current source code -->
-	<target name="compile" depends="init">
-		<javac debug="on" srcdir="${src.dir}" destdir="${bin.dir}" encoding="UTF-8">
-			<classpath refid="project.classpath" />
-		</javac>
-		<copy todir="${bin.dir}">
-			<fileset dir="${resource.dir}" />
-		</copy>
-		<copy todir="${emma.dir}">
-			<fileset file="${basedir}/*.properties" />
-		</copy>
-	</target>
-
-	<!-- Compile the test source control -->
-	<target name="compile-test">
-		<javac debug="on" srcdir="${test.dir}" destdir="${bin.dir}" encoding="UTF-8">
-			<classpath refid="project.classpath" />
-		</javac>
-	</target>
-
-	<!-- Define tasks-->
 	<taskdef resource="emma_ant.properties" classpathref="project.classpath" />
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="project.classpath" />
 	<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="project.classpath" />
 	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="project.classpath" />
 
-	<!-- Instrument all classes using Emma plugin -->
-	<target name="instrument" depends="compile">
+	<!-- Initialize(delete/create) all directories to be used -->
+	<target name="clean">
+		<delete dir="${bin.dir}" />
+		<delete dir="${out.dir}" />
+		<mkdir dir="${bin.dir}" />
+		<mkdir dir="${bin.classes.dir}" />
+		<mkdir dir="${bin.test.dir}" />
+		<mkdir dir="${bin.emma.dir}" />
+		<mkdir dir="${out.dir}" />
+		<mkdir dir="${metrics.dir}" />
+		<mkdir dir="${emma.dir}" />
+		<mkdir dir="${pmd.dir}" />
+		<mkdir dir="${junit.dir}" />
+		<mkdir dir="${bin.lib.dir}"/>
+	</target>
+
+	<!-- Compile the current source code -->
+	<target name="compile" depends="clean">
+		<javac debug="on" srcdir="${src.dir}" destdir="${bin.classes.dir}" encoding="UTF-8">
+			<classpath refid="project.classpath" />
+		</javac>
+		<copy todir="${bin.classes.dir}">
+			<fileset dir="${resource.dir}" />
+			<fileset file="${basedir}/*.properties" />
+		</copy>
+	</target>
+
+	<!-- Compile the test source control -->
+	<target name="compile-tests" depends="compile">
+		<copy todir="${bin.test.dir}">
+			<fileset dir="${bin.classes.dir}" />
+		</copy>
+		<javac debug="on" srcdir="${test.dir}" destdir="${bin.test.dir}" encoding="UTF-8">
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<!-- compile-emma all classes using Emma plugin -->
+	<target name="compile-emma" depends="compile-tests">
 		<emma>
-			<instr instrpath="${bin.dir}" destdir="${emma.dir}" metadatafile="${emma.dir}/metadata.emma" merge="false" mode="fullcopy" />
+			<instr instrpath="${bin.test.dir}" destdir="${bin.emma.dir}" metadatafile="${bin.emma.dir}/metadata.emma" merge="false" mode="fullcopy" />
 		</emma>
+		<copy todir="${bin.emma.dir}">
+			<fileset dir="${resource.dir}" />
+			<fileset file="${basedir}/*.properties" />
+		</copy>
 	</target>
 
 	<!-- Run suite case tests -->
-	<target name="test" depends="instrument, compile, compile-test">
+	<target name="tests" depends="compile-emma">
 		<junit haltonfailure="false" haltonerror="false" fork="true" printsummary="yes" failureproperty="unit.test.failure">
 			<classpath>
-				<pathelement location="${emma.dir}/classes" />
-				<pathelement location="${emma.dir}/lib" />
+				<pathelement location="${bin.emma.dir}/classes" />
 				<path refid="project.classpath" />
 			</classpath>
 			<formatter type="xml" />
-			<test name="${junit.suite}" todir="${junit.dir}" />
-			<jvmarg value="-Demma.coverage.out.file=${emma.dir}/coverage.emma" />
+			<jvmarg value="-Demma.coverage.out.file=${bin.emma.dir}/coverage.emma" />
 			<jvmarg value="-Demma.coverage.out.merge=false" />
+			<batchtest fork="yes" todir="${junit.dir}">
+				<fileset dir="${bin.test.dir}">
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
 		</junit>
 		<junitreport todir="${junit.dir}">
 			<fileset dir="${junit.dir}">
@@ -98,12 +108,13 @@
 	</target>
 
 	<!-- Generate code coverage metrics -->
-	<target name="emma" depends="test">
+	<target name="emma" depends="tests">
 		<emma>
 			<report sourcepath="${src.dir}" sort="+block,+name,+method,+class" metrics="method:70,block:80,line:80,class:100" encoding="UTF-8">
-				<fileset dir="${emma.dir}">
+				<fileset dir="${bin.emma.dir}">
 					<include name="*.emma" />
 				</fileset>
+				<xml outfile="${emma.dir}/coverage.xml" depth="method" />
 				<html outfile="${emma.dir}/index.html" depth="method" columns="name,class,method,block,line" />
 			</report>
 		</emma>
@@ -132,11 +143,17 @@
 		<xslt in="${cpd.file.name}" style="${cpd.file.formatter}" out="${cpd.report.file}" />
 	</target>
 
+	
+	<target name="clone-libs" depends="clean">
+		<ivy:retrieve conf="deploy" pattern="${bin.lib.dir}/[type]/[artifact]-[revision].[ext]" sync="true"/>
+	</target>
+	
 	<!-- Compress the app and generate the war file -->
-	<target name="jar" depends="compile,emma,pmd,cpd">
+	<target name="jar" depends="compile,tests,emma,pmd,cpd,clone-libs">
 		<jar destfile="${jar.file}" compress="true">
-			<zipgroupfileset dir="${lib.dir}" includes="*/**.jar" />
-			<fileset dir="${bin.dir}" />
+			<zipgroupfileset dir="${bin.lib.dir}" includes="*/**.jar"/>
+
+			<fileset dir="${bin.classes.dir}" />
 			<manifest>
 				<attribute name="Main-Class" value="${jar.main.class}" />
 			</manifest>

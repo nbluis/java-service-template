@@ -36,5 +36,11 @@
 
 		<dependency org="junit" name="junit" rev="4.11" conf="dev->*" />
 		<dependency org="org.mockito" name="mockito-all" rev="1.9.5" conf="dev->*" />
+		<dependency org="pmd" name="pmd" rev="4.3" conf="dev->*"/>
+		<dependency org="emma" name="emma" rev="2.1.5320" conf="dev->master"/>
+		<dependency org="emma" name="emma_ant" rev="2.1.5320" conf="dev->master"/>
+
+		<!-- global exclusion, apache ivy old ant version cause problems when running ant task -->
+		<exclude org="ant" artifact="ant"/>
 	</dependencies>
 </ivy-module>
