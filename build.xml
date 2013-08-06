@@ -1,4 +1,4 @@
-<project name="org.javaservicetemplate.core" basedir="." default="jar" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="javaservicetemplate" basedir="." default="jar" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!--  Default folders to be used  -->
 	<property name="jar.main.class" value="org.javaservicetemplate.core.Main" />
@@ -21,21 +21,46 @@
 	<property name="cpd.file.name" value="${pmd.dir}/cpd_pmd.xml" />
 	<property name="cpd.file.formatter" value="${resource.dir}/cpdhtml.xslt" />
 	<property name="cpd.report.file" value="${pmd.dir}/cpd_pmd.html" />
+	<property name="ivy.jar.dir" value="${user.home}/.ant/lib" />
 
 	<!-- Defining classpath project-->
 	<path id="project.classpath">
 		<pathelement location="${bin.classes.dir}" />
 	</path>
 
-	<ivy:cachepath conf="dev" pathid="project.classpath" />
+	<!-- Verify if ivy.jar in available in the ant plugins directory -->
+	<target name="check-ivy-jar">
+		<condition property="ivy.not.available">
+			<not>
+				<available file="${ivy.jar.dir}/ivy.jar" />
+			</not>
+		</condition>
+	</target>
 
-	<taskdef resource="emma_ant.properties" classpathref="project.classpath" />
-	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="project.classpath" />
-	<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="project.classpath" />
-	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="project.classpath" />
+	<!-- If ivy.jar isn't available download it from maven repository -->
+	<target name="ivy-download" depends="check-ivy-jar" if="ivy.not.available" description="Used to install the ivy task jar">
+		<mkdir dir="${ivy.jar.dir}" />
+		<get dest="${ivy.jar.dir}/ivy.jar" src="http://search.maven.org/remotecontent?filepath=org/apache/ivy/ivy/2.3.0/ivy-2.3.0.jar" />
+	</target>
+
+	<!-- Put ivy.jar in classpath -->
+	<target name="resolve-ivy" depends="ivy-download">
+		<path id="project.classpath">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="project.classpath"/>
+		<ivy:cachepath conf="dev" pathid="project.classpath" />
+	</target>
+
+	<target name="resolve-tasks" depends="resolve-ivy">
+		<taskdef resource="emma_ant.properties" classpathref="project.classpath" />
+		<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="project.classpath" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="project.classpath" />
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="project.classpath" />
+	</target>
 
 	<!-- Initialize(delete/create) all directories to be used -->
-	<target name="clean">
+	<target name="clean" depends="resolve-tasks">
 		<delete dir="${bin.dir}" />
 		<delete dir="${out.dir}" />
 		<mkdir dir="${bin.dir}" />
@@ -47,7 +72,7 @@
 		<mkdir dir="${emma.dir}" />
 		<mkdir dir="${pmd.dir}" />
 		<mkdir dir="${junit.dir}" />
-		<mkdir dir="${bin.lib.dir}"/>
+		<mkdir dir="${bin.lib.dir}" />
 	</target>
 
 	<!-- Compile the current source code -->
@@ -143,15 +168,15 @@
 		<xslt in="${cpd.file.name}" style="${cpd.file.formatter}" out="${cpd.report.file}" />
 	</target>
 
-	
+
 	<target name="clone-libs" depends="clean">
-		<ivy:retrieve conf="deploy" pattern="${bin.lib.dir}/[type]/[artifact]-[revision].[ext]" sync="true"/>
+		<ivy:retrieve conf="deploy" pattern="${bin.lib.dir}/[type]/[artifact]-[revision].[ext]" sync="true" />
 	</target>
-	
+
 	<!-- Compress the app and generate the war file -->
 	<target name="jar" depends="compile,tests,emma,pmd,cpd,clone-libs">
 		<jar destfile="${jar.file}" compress="true">
-			<zipgroupfileset dir="${bin.lib.dir}" includes="*/**.jar"/>
+			<zipgroupfileset dir="${bin.lib.dir}" includes="*/**.jar" />
 
 			<fileset dir="${bin.classes.dir}" />
 			<manifest>
