@@ -115,25 +115,29 @@ public abstract class AbstractDaoMock<T extends Model<K>, K> {
 		assertEquals(expecrtedOrder, orderCaptor.getValue().toString());
 	}
 
-	public static void assertNotContainsCriteria(ArgumentCaptor<Criterion> captor, String expectedCriteria) {
+	public void assertNotContainsCriteria(ArgumentCaptor<Criterion> captor, String expectedCriteria) {
 		assertNotContainsCriteria(captor.getAllValues(), expectedCriteria);
 	}
 
-	public static void assertNotContainsCriteria(List<Criterion> criteriaList, String expectedCriteria) {
+	public void assertNotContainsCriteria(List<Criterion> criteriaList, String expectedCriteria) {
 		if (containsCriteria(criteriaList, expectedCriteria))
 			fail("The criterion list contains the expected criteria: " + expectedCriteria);
 	}
 
-	public static void assertContainsCriteria(ArgumentCaptor<Criterion> captor, String expectedCriteria) {
+	public void assertContainsCriteria(String expectedCriteria) {
+		assertContainsCriteria(criterionCaptor, expectedCriteria);
+	}
+
+	public void assertContainsCriteria(ArgumentCaptor<Criterion> captor, String expectedCriteria) {
 		assertContainsCriteria(captor.getAllValues(), expectedCriteria);
 	}
 
-	public static void assertContainsCriteria(List<Criterion> criteriaList, String expectedCriteria) {
+	public void assertContainsCriteria(List<Criterion> criteriaList, String expectedCriteria) {
 		if (!containsCriteria(criteriaList, expectedCriteria))
 			fail("The criterion list cold not contains the expected criteria: " + expectedCriteria);
 	}
 
-	private static boolean containsCriteria(List<Criterion> criteriaList, String criteria) {
+	private boolean containsCriteria(List<Criterion> criteriaList, String criteria) {
 		for (Criterion criterion : criteriaList) {
 			if (criterion.toString().equals(criteria))
 				return true;
