@@ -6,6 +6,8 @@ Template project to create runnable services in java.
 Using:
 - Eclipse (with Apache Ivy IDE)
 - Hibernate Standalone
+- C3P0
+- Jadira User Types
 - Apache Ivy
 - Apache Ant
 - Apache commons-lang
@@ -13,6 +15,8 @@ Using:
 - Log4J
 - jUnit
 - Mockito
+- Emma
+- PMD
 
 HOW-TO-USE
 ==========

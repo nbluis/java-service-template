@@ -30,10 +30,15 @@
 	</configurations>
 	<dependencies>
 		<dependency org="com.google.inject" name="guice" rev="3.0" conf="deploy->*" /> 
-		<dependency org="org.hibernate" name="hibernate-core" rev="4.2.3.Final" conf="deploy->*" />
-		<dependency org="c3p0" name="c3p0" rev="0.9.1.2" conf="deploy->master"/>
 		<dependency org="org.apache.commons" name="commons-lang3" rev="3.1" conf="deploy->master"/>
+		<dependency org="joda-time" name="joda-time" rev="2.2" conf="deploy->master"/>
 		<dependency org="log4j" name="log4j" rev="1.2.17" conf="deploy->master" />
+
+		<!-- persistence -->
+		<dependency org="org.hibernate" name="hibernate-core" rev="4.2.3.Final" conf="deploy->*" />
+		<dependency org="org.hibernate" name="hibernate-c3p0" rev="4.2.3.Final" conf="deploy->master"/>
+		<dependency org="c3p0" name="c3p0" rev="0.9.1.2" conf="deploy->master"/>
+		<dependency org="org.jadira.usertype" name="usertype.core" rev="3.0.0.GA" conf="deploy->master,compile"/>
 
 		<dependency org="junit" name="junit" rev="4.11" conf="dev->*" />
 		<dependency org="org.mockito" name="mockito-all" rev="1.9.5" conf="dev->*" />
