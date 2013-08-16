@@ -1,28 +1,34 @@
 package org.javaservicetemplate.core;
 
-import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 public class ShutdownSignerTest {
 
+	@InjectMocks
 	private ShutdownSigner signer;
+	@Mock
+	private Process processOne;
+	@Mock
+	private Process processTwo;
 
 	@Before
 	public void setUp() {
-		this.signer = new ShutdownSigner();
+		initMocks(this);
 	}
 
 	@Test
-	public void shouldStopStatusBeFalseByDefault() {
-		assertFalse(signer.mustStop());
-	}
+	public void shouldSendStopToAllRegisteredProcessWhenReceiveAStop() {
+		signer.registerProcess(processOne);
+		signer.registerProcess(processTwo);
+		signer.run();
 
-	@Test
-	public void shouldShutdownProcessAfterReadyToStop() {
-		signer.setReadyToStop();
-
-		signer.run(); //sucess if the process is released
+		verify(processOne).doStop();
+		verify(processTwo).doStop();
 	}
 }

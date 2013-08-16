@@ -1,8 +1,14 @@
 package org.javaservicetemplate.core;
 
-public class ServiceManager {
+public class ServiceManager extends Process {
 
-	public void run() {
+	@Override
+	void doProcess() {
 		System.out.println("Running manager now!");
+	}
+
+	@Override
+	long getSleepTime() {
+		return 5000;
 	}
 }

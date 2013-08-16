@@ -1,7 +1,6 @@
 package org.javaservicetemplate.core;
 
 import static java.lang.System.currentTimeMillis;
-import static org.javaservicetemplate.core.Config.getConfiguration;
 import static org.javaservicetemplate.injection.InjectorCreator.createInjector;
 
 import org.apache.log4j.Logger;
@@ -16,46 +15,30 @@ public class Main {
 	private ServiceManager manager;
 	private ShutdownSigner shutDownSigner;
 
-	protected void start() {
-		this.injector = createInjector();
-		setUpShutdownMonitor();
-		startupManager();
-		runMainLoop();
-	}
-
-	protected void setUpShutdownMonitor() {
-		this.shutDownSigner = injector.getInstance(ShutdownSigner.class);
-		Runtime.getRuntime().addShutdownHook(shutDownSigner);
-	}
-
-	protected void startupManager() {
+	public void start() {
 		long initTime = currentTimeMillis();
-		this.manager = injector.getInstance(ServiceManager.class);
+
+		injector = createInjector();
+		setUpShutdownMonitor();
+		setUpManager();
+		startServices();
+
 		LOGGER.info(String.format("Service started in %d ms", currentTimeMillis() - initTime));
 	}
 
-	protected void runMainLoop() {
-		long lastManagerRun = 0;
+	private void setUpShutdownMonitor() {
+		shutDownSigner = injector.getInstance(ShutdownSigner.class);
+	}
 
-		try {
-			do {
-				if (shutDownSigner.mustStop()) {
-					shutDownSigner.setReadyToStop();
-					return;
-				}
+	private void setUpManager() {
+		this.manager = injector.getInstance(ServiceManager.class);
+	}
 
-				long currentSleepTime = currentTimeMillis() - lastManagerRun;
-				if (currentSleepTime >= getConfiguration().getManagerSleepTime()) {
-					LOGGER.debug("Running manager now");
-					lastManagerRun = currentTimeMillis();
-					manager.run();
-				}
+	protected void startServices() {
+		shutDownSigner.registerProcess(manager);
 
-				Thread.sleep(5000);
-			} while (true);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
+		Runtime.getRuntime().addShutdownHook(shutDownSigner);
+		manager.start();
 	}
 
 	public static void main(String[] args) {

@@ -1,12 +1,10 @@
 package org.javaservicetemplate.core;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import org.javaservicetemplate.injection.InjectorCreator;
-import org.javaservicetemplate.util.TestException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,22 +14,12 @@ import com.google.inject.Injector;
 
 public class MainTest {
 
-	private Main main;
-
 	@Mock
 	private Injector injector;
 	@Mock
 	private ShutdownSigner shutdownSigner;
-
-	private ServiceManager manager = new ServiceManager() {
-
-		private int calls = 0;
-
-		public void run() {
-			if (++calls == 2)
-				throw new TestException();
-		}
-	};
+	@Mock
+	private ServiceManager manager;
 
 	@Before
 	public void setUp() {
@@ -40,7 +28,6 @@ public class MainTest {
 
 		given(injector.getInstance(ShutdownSigner.class)).willReturn(shutdownSigner);
 		given(injector.getInstance(ServiceManager.class)).willReturn(manager);
-		this.main = new Main();
 	}
 
 	@After
@@ -49,22 +36,9 @@ public class MainTest {
 	}
 
 	@Test
-	public void shouldCallImporterManagerContinuously() {
-		Config.getConfiguration().setManagerSleepTime(1L);
-		try {
-			Main.main(null);
-		} catch (Exception e) {
-			assertTrue(e.getCause() instanceof TestException);
-		}
+	public void shouldStartEachProcessWhenStarting() {
+		Main.main(null);
+
+		verify(manager).start();
 	}
-
-	@Test
-	public void shouldMarkShutDownSignerToStopWhenTheProcessMustStop() {
-		given(shutdownSigner.mustStop()).willReturn(true);
-
-		main.start();
-
-		verify(shutdownSigner).setReadyToStop();
-	}
-
 }
