@@ -12,6 +12,13 @@ repositories {
     jcenter()
 }
 
+task copyConfig(type: Copy) {
+	from 'config.properties'
+	into "$buildDir/classes/"
+}
+
+compileJava.dependsOn copyConfig
+
 dependencies {
 	compile 'com.google.inject:guice:4.1.0'
 	compile 'org.apache.commons:commons-lang3:3.5'
