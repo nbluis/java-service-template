@@ -3,5 +3,6 @@ lib
 /.gradle/
 /build/
 /bin/
+/.settings/
 .classpath
 .project
