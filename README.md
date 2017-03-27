@@ -19,8 +19,9 @@ HOW-TO-USE
 
 - Rename project folder
 - Rename project name 'rootProject.name' on 'settings.gradle' file
-- Rename mainClassName on 'build.gradle' file
 - Generate ide project files (ex. gradle eclipse)
+- Rename source packages
+- Rename mainClassName on 'build.gradle' file
 - Read the "CONFIGURING" section.
 - Be happy!
 
