@@ -23,6 +23,7 @@
 
 		<property name="hibernate.current_session_context_class">thread</property>
 		
+		<property name="hibernate.temp.use_jdbc_metadata_defaults">false</property>
 		<property name="hibernate.hbm2ddl.auto">validate</property>
 
 	 	<mapping package="org.javaservicetemplate.model" />
