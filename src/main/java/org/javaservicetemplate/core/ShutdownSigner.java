@@ -3,11 +3,12 @@ package org.javaservicetemplate.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ShutdownSigner extends Thread {
 
-	private static final Logger LOGGER = Logger.getLogger(ShutdownSigner.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownSigner.class);
 
 	private List<Process> processes = new ArrayList<Process>();
 

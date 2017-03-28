@@ -3,13 +3,14 @@ package org.javaservicetemplate.core;
 import static java.lang.System.currentTimeMillis;
 import static org.javaservicetemplate.injection.InjectorCreator.createInjector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Injector;
 
 public class Main {
 
-	private static final Logger LOGGER = Logger.getLogger(Main.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
 	private Injector injector;
 	private ServiceManager manager;

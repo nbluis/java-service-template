@@ -2,7 +2,7 @@ package org.javaservicetemplate.core;
 
 import static java.lang.System.currentTimeMillis;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Process extends Thread {
 
@@ -27,14 +27,14 @@ public abstract class Process extends Thread {
 				try {
 					doProcess();
 				} catch (Exception e) {
-					Logger.getLogger(this.getClass()).error(e.getMessage(), e);
+					LoggerFactory.getLogger(this.getClass()).error(e.getMessage(), e);
 				}
 			}
 
 			try {
 				Thread.sleep(VERIFICATION_TIME);
 			} catch (InterruptedException e) {
-				//ignore
+				// ignore
 			}
 		} while (!mustStop);
 
@@ -47,7 +47,7 @@ public abstract class Process extends Thread {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				//ignore
+				// ignore
 			}
 		}
 	}
